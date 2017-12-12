@@ -1,0 +1,62 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'idea'
+
+// Java 8
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+// Use as maven groupId/artifactId/version
+group = 'com.coder4.sbmvt'
+project.archivesBaseName = 'database'
+project.version = '0.0.1'
+
+// source & javadoc pom
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+artifacts {
+    archives sourcesJar
+}
+
+// In this section you declare where to find the dependencies of your project
+repositories {
+    maven {
+        credentials {
+            username "$mavenUser"
+            password "$mavenPass"
+        }
+        url 'http://maven.coder4.com/nexus/content/groups/public'
+    }
+}
+
+// maven deploy config start
+configurations {
+    deployerJars
+}
+
+uploadArchives {
+    repositories.mavenDeployer {
+        configuration = configurations.deployerJars
+        repository(url: "http://maven.coder4.com/nexus/content/repositories/releases/") {
+            authentication(userName: "$mavenUser", password: "$mavenPass")
+        }
+        snapshotRepository(url: "http://maven.coder4.com/nexus/content/repositories/snapshots/") {
+            authentication(userName: "$mavenUser", password: "$mavenPass")
+        }
+    }
+}
+
+// maven deploy config end
+
+dependencies {
+    // version not important
+    compile 'org.springframework.boot:spring-boot-starter-jdbc:1.5.6.RELEASE'
+    compile 'mysql:mysql-connector-java:5.1.45'
+    compile 'com.h2database:h2:1.4.196'
+
+    // Use JUnit test framework
+    testCompile 'junit:junit:4.12'
+}
+
